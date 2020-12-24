@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "typeRoots": ["types", "node_modules/@types", "node_modules/@aspectron/flow-async/index.d.ts"],
     "paths": {
-      "*": ["./types/*"]
+      "*": ["./types/*", "./lib/*"]
     },
     "baseUrl": ".",
     "outDir": "./dist",
