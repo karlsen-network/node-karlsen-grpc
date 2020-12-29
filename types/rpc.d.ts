@@ -31,6 +31,7 @@ export namespace RPC {
 		amount: number;
 		scriptPubKey: string;
 		blockBlueScore: number; 
+		isCoinbase: boolean;
 	}
 
 	interface SubmitTransactionRequest{
