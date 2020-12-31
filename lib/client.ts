@@ -147,6 +147,7 @@ export class Client {
 			}
 
 			let subscribers:SubscriberItem[]|undefined = this.subscribers.get(o.name);
+			//this.log("handleIntake:o.name:", o.name, subscribers)
 			if(subscribers){
 				subscribers.map(subscriber=>{
 					subscriber.callback(o.payload)
@@ -206,7 +207,7 @@ export class Client {
 
 		let eventName = subject.replace("notify", "").replace("Request", "Notification")
 		eventName = eventName[0].toLowerCase()+eventName.substr(1);
-		console.log("subscribe:eventName", eventName)
+		this.verbose && this.log("subscribe:eventName", eventName)
 
 		let subscribers:SubscriberItem[]|undefined = this.subscribers.get(eventName);
 		if(!subscribers){

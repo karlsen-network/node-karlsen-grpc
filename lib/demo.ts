@@ -20,4 +20,4 @@ const testNotification = async(name="BlockAdded", data={})=>{
 }
 
 
-testNotification();
+testNotification("UtxosChanged", {addresses:["kaspatest:qpuyhaxz2chn3lsvf8g7q5uvaezpp5m7pyny4k8tyq"]});
