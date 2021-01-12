@@ -140,6 +140,9 @@ export class Client {
 		} else {
 			let handlers = this.pending[o.name];
 			this.verbose && console.log('intake:',o,'handlers:',handlers);
+			//if(o.name == 'getUtxosByAddressesResponse'){
+			//	console.log(JSON.stringify(o, null, "  "));
+			//}
 			if(handlers && handlers.length){
 				let pending:QueueItem|undefined = handlers.shift();
 				if(pending)
