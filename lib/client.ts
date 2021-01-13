@@ -208,8 +208,7 @@ export class Client {
 		if(!this.client)
 			return Promise.reject('not connected') as Rpc.SubPromise<T>;
 
-		let eventName = subject.replace("notify", "").replace("Request", "Notification")
-		eventName = eventName[0].toLowerCase()+eventName.substr(1);
+		let eventName = this.subject2EventName(subject);
 		this.verbose && this.log("subscribe:eventName", eventName)
 
 		let subscribers:SubscriberItem[]|undefined = this.subscribers.get(eventName);
@@ -224,6 +223,24 @@ export class Client {
 
 		p.uid = uid;
 		return p;
+	}
+
+	subject2EventName(subject:string){
+		let eventName = subject.replace("notify", "").replace("Request", "Notification")
+		return eventName[0].toLowerCase()+eventName.substr(1);
+	}
+
+	unSubscribe(subject:string, uid:string=''){
+		let eventName = this.subject2EventName(subject);
+		let subscribers:SubscriberItem[]|undefined = this.subscribers.get(eventName);
+		if(!subscribers)
+			return
+		if(!uid){
+			this.subscribers.delete(eventName);
+		}else{
+			subscribers = subscribers.filter(sub=>sub.uid!=uid)
+			this.subscribers.set(eventName, subscribers);
+		}
 	}
 
 }
