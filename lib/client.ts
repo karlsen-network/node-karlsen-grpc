@@ -94,14 +94,19 @@ export class Client {
 			reconnect();
 		});
 
-		let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
-		.catch(e=>{
+		await new Promise((resolve)=>{
+			dpc(1000, async()=>{
+				let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
+				.catch(e=>{
 
+				})
+				this.verbose && this.log("getVirtualSelectedParentBlueScoreRequest:response", response)
+				if(response && response.blueScore){
+					this._setConnected(true);
+				}
+				resolve();
+			})
 		})
-		this.verbose && this.log("getVirtualSelectedParentBlueScoreRequest:response", response)
-		if(response && response.blueScore){
-			this._setConnected(true);
-		}
 
 		//testing
 		/*
