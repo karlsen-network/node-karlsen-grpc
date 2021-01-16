@@ -23,6 +23,9 @@ export class Client {
 	log:Function;
 	proto:KaspadPackage|undefined;
 	subscribers: SubscriberItemMap = new Map();
+	isConnected:boolean=false;
+	connectCBs:Function[] = [];
+	disconnectCBs:Function[] = [];
 
 	constructor(options:any) {
 		this.options = Object.assign({
@@ -53,7 +56,7 @@ export class Client {
 		return RPC;
 	}
 
-	connect() {
+	async connect() {
 		this.reconnect = true;
 		this.verbose && this.log('gRPC Client connecting to', this.options.host);
 		const RPC = this.getServiceClient();
@@ -67,6 +70,7 @@ export class Client {
 		this.stream = this.createStream();
 		this.initIntake(this.stream);
 		const reconnect = () => {
+			this._setConnected(false);
 			if(this.reconnect_dpc) {
 				clearDPC(this.reconnect_dpc);
 				delete this.reconnect_dpc;
@@ -88,7 +92,44 @@ export class Client {
 		this.stream.on('end', (...args:any) => {
 			this.verbose && this.log('stream:end', ...args);
 			reconnect();
+		});
+
+		let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
+		.catch(e=>{
+
 		})
+		this.verbose && this.log("getVirtualSelectedParentBlueScoreRequest:response", response)
+		if(response && response.blueScore){
+			this._setConnected(true);
+		}
+
+		//testing
+		/*
+		dpc(15000, ()=>{
+			this.stream.end();
+		})
+		*/
+	}
+
+	_setConnected(isConnected:boolean){
+		if(this.isConnected == isConnected)
+			return;
+		this.isConnected = isConnected;
+
+		let cbs = isConnected?this.connectCBs:this.disconnectCBs;
+		//console.log("this.isConnected", this.isConnected, cbs)
+		cbs.forEach(fn=>{
+			fn();
+		})
+	}
+
+	onConnect(callback:Function){
+		this.connectCBs.push(callback)
+		if(this.isConnected)
+			callback();
+	}
+	onDisconnect(callback:Function){
+		this.disconnectCBs.push(callback)
 	}
 
 	disconnect() {
