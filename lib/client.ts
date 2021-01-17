@@ -94,7 +94,7 @@ export class Client {
 			reconnect();
 		});
 
-		await new Promise((resolve)=>{
+		await new Promise<void>((resolve)=>{
 			dpc(1000, async()=>{
 				let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
 				.catch(e=>{
