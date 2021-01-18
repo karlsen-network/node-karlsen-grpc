@@ -25,19 +25,26 @@ export class Client {
 	subscribers: SubscriberItemMap = new Map();
 	isConnected:boolean=false;
 	connectCBs:Function[] = [];
+	connectFailureCBs:Function[] = [];
+	errorCBs:Function[] = [];
 	disconnectCBs:Function[] = [];
 
 	constructor(options:any) {
 		this.options = Object.assign({
 			protoPath: __dirname + '/../../messages.proto',
-			host: 'localhost:16210'
+			host: 'localhost:16210',
+			reconnect: true,
+			verbose : false
 		}, options||{});
 		this.pending = { };
 		this.log = Function.prototype.bind.call(
 			console.log,
 			console,
-			`[KASPA-RPC-CLIENT]:`
+			`[Kaspa gRPC]:`
 		);
+		this.reconnect = this.options.reconnect;
+		this.verbose = this.options.verbose;
+		// console.log(this);
 	}
 
 	getServiceClient():ServiceClientConstructor {
@@ -57,7 +64,7 @@ export class Client {
 	}
 
 	async connect() {
-		this.reconnect = true;
+		// this.reconnect = true;
 		this.verbose && this.log('gRPC Client connecting to', this.options.host);
 		const RPC = this.getServiceClient();
 		this.client = new RPC(this.options.host, gRPC.credentials.createInsecure(),
@@ -92,13 +99,18 @@ export class Client {
 		this.stream.on('end', (...args:any) => {
 			this.verbose && this.log('stream:end', ...args);
 			reconnect();
+
+			// if(!this.reconnect) {
+			// 	this.disconnectCBs.forEach(fn=>fn());
+			// }
 		});
 
 		await new Promise<void>((resolve)=>{
-			dpc(1000, async()=>{
-				let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
+//			dpc(1000, async()=>{
+			dpc(0, async()=>{
+					let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
 				.catch(e=>{
-
+					this.connectFailureCBs.forEach(fn=>fn(e));
 				})
 				this.verbose && this.log("getVirtualSelectedParentBlueScoreRequest:response", response)
 				if(response && response.blueScore){
@@ -132,6 +144,12 @@ export class Client {
 		this.connectCBs.push(callback)
 		if(this.isConnected)
 			callback();
+	}
+	onConnectFailure(callback:Function){
+		this.connectFailureCBs.push(callback)
+	}
+	onError(callback:Function){
+		this.errorCBs.push(callback)
 	}
 	onDisconnect(callback:Function){
 		this.disconnectCBs.push(callback)
