@@ -93,6 +93,8 @@ export class Client {
 			}
 		}
 		this.stream.on('error', (error:any) => {
+			// console.log("client:",error);
+			this.errorCBs.forEach(fn=>fn(error.toString(), error));
 			this.verbose && this.log('stream:error', error);
 			reconnect();
 		})
@@ -107,7 +109,7 @@ export class Client {
 
 		await new Promise<void>((resolve)=>{
 //			dpc(1000, async()=>{
-			dpc(0, async()=>{
+			dpc(100, async()=>{
 					let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
 				.catch(e=>{
 					this.connectFailureCBs.forEach(fn=>fn(e));
