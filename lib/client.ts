@@ -34,13 +34,14 @@ export class Client {
 			protoPath: __dirname + '/../../messages.proto',
 			host: 'localhost:16210',
 			reconnect: true,
-			verbose : false
+			verbose : false,
+			uid:(Math.random()*1000).toFixed(0)
 		}, options||{});
 		this.pending = { };
 		this.log = Function.prototype.bind.call(
 			console.log,
 			console,
-			`[Kaspa gRPC]:`
+			`[Kaspa gRPC ${this.options.uid}]:`
 		);
 		this.reconnect = this.options.reconnect;
 		this.verbose = this.options.verbose;
@@ -62,8 +63,11 @@ export class Client {
 		const {P2P, RPC} = proto.protowire;
 		return RPC;
 	}
-
-	async connect() {
+	connect(){
+		this.reconnect = true;
+		return this._connect();
+	}
+	async _connect() {
 		// this.reconnect = true;
 		this.verbose && this.log('gRPC Client connecting to', this.options.host);
 		const RPC = this.getServiceClient();
@@ -88,7 +92,7 @@ export class Client {
 			delete this.client;
 			if(this.reconnect) {
 				this.reconnect_dpc = dpc(1000, () => {
-					this.connect();
+					this._connect();
 				})
 			}
 		}
