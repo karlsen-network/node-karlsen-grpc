@@ -101,16 +101,11 @@ export class Client {
 		this.stream.on('end', (...args:any) => {
 			this.verbose && this.log('stream:end', ...args);
 			reconnect();
-
-			// if(!this.reconnect) {
-			// 	this.disconnectCBs.forEach(fn=>fn());
-			// }
 		});
 
 		await new Promise<void>((resolve)=>{
-//			dpc(1000, async()=>{
 			dpc(100, async()=>{
-					let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
+				let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
 				.catch(e=>{
 					this.connectFailureCBs.forEach(fn=>fn(e));
 				})
@@ -121,13 +116,6 @@ export class Client {
 				resolve();
 			})
 		})
-
-		//testing
-		/*
-		dpc(15000, ()=>{
-			this.stream.end();
-		})
-		*/
 	}
 
 	_setConnected(isConnected:boolean){
