@@ -1,13 +1,13 @@
 {
   "name": "@kaspa/grpc",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Node gRPC interface for Kaspa",
   "main": "dist/index.js",
   "author": "ASPECTRON Inc",
   "license": "ISC",
   "scripts": {
     "watch": "tsc --watch",
-    "prepublishOnly": "rm -rf ./dist && npm install --also=dev && tsc"
+    "prepublishOnly": "rm -rf ./dist && rm -f package-lock.json && npm install --also=dev && tsc"
   },
   "dependencies": {
     "@grpc/grpc-js": "*",
