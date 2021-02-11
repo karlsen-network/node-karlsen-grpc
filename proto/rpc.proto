@@ -41,6 +41,12 @@ message SubmitBlockRequestMessage{
 }
 
 message SubmitBlockResponseMessage{
+  enum RejectReason {
+    NONE = 0;
+    BLOCK_INVALID = 1;
+    IS_IN_IBD = 2;
+  }
+  RejectReason rejectReason = 1;
   RPCError error = 1000;
 }
 
@@ -81,6 +87,7 @@ message NotifyBlockAddedResponseMessage{
 // See: NotifyBlockAddedRequestMessage
 message BlockAddedNotificationMessage{
   BlockMessage block = 1;
+  BlockVerboseData blockVerboseData = 2;
 }
 
 // GetPeerAddressesRequestMessage requests the list of known kaspad addresses in the
@@ -230,7 +237,6 @@ message AcceptedBlock{
 message GetBlockRequestMessage{
   // The hash of the requested block
   string hash = 1;
-  string subnetworkId = 2;
 
   // Whether to include transaction data in the response
   bool includeTransactionVerboseData = 3;
@@ -335,15 +341,13 @@ message GetVirtualSelectedParentChainFromBlockResponseMessage{
 // kaspad's current virtual.
 message GetBlocksRequestMessage{
   string lowHash = 1;
-  bool includeBlockHexes = 2;
-  bool includeBlockVerboseData = 3;
-  bool includeTransactionVerboseData = 4;
+  bool includeBlockVerboseData = 2;
+  bool includeTransactionVerboseData = 3;
 }
 
 message GetBlocksResponseMessage{
   repeated string blockHashes = 1;
-  repeated string blockHexes = 2;
-  repeated BlockVerboseData blockVerboseData = 3;
+  repeated BlockVerboseData blockVerboseData = 2;
   RPCError error = 1000;
 }
 
@@ -526,4 +530,31 @@ message NotifyVirtualSelectedParentBlueScoreChangedResponseMessage {
 // See NotifyVirtualSelectedParentBlueScoreChangedRequestMessage
 message VirtualSelectedParentBlueScoreChangedNotificationMessage {
   uint64 virtualSelectedParentBlueScore = 1;
+}
+
+// BanRequestMessage bans the given ip.
+message BanRequestMessage{
+  string ip = 1;
+}
+
+message BanResponseMessage{
+  RPCError error = 1000;
+}
+
+// UnbanRequestMessage unbans the given ip.
+message UnbanRequestMessage{
+  string ip = 1;
+}
+
+message UnbanResponseMessage{
+  RPCError error = 1000;
+}
+
+// GetInfoRequestMessage returns info about the node.
+message GetInfoRequestMessage{
+}
+
+message GetInfoResponseMessage{
+  string p2pId = 1;
+  RPCError error = 1000;
 }
