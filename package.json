@@ -1,5 +1,5 @@
 {
-  "name": "kaspa-grpc",
+  "name": "@kaspa/grpc",
   "version": "0.1.0",
   "description": "Node gRPC interface for Kaspa",
   "main": "dist/index.js",
@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "prepublishOnly": "rm -rf ./dist && tsc"
   },
   "dependencies": {
     "@grpc/grpc-js": "*",

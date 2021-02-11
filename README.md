@@ -12,7 +12,7 @@ Clone the following repository:
 Example
 ---
 ```js
-const { Client } = require('kaspa-grpc');
+const { Client } = require('@kaspa/grpc');
 
 const client = new Client({
     host:"127.0.0.1:16210"
