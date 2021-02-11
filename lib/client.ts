@@ -28,6 +28,7 @@ export class Client {
 	connectFailureCBs:Function[] = [];
 	errorCBs:Function[] = [];
 	disconnectCBs:Function[] = [];
+	connectionPhase:boolean;
 
 	constructor(options:any) {
 		this.options = Object.assign({
@@ -45,6 +46,7 @@ export class Client {
 		);
 		this.reconnect = this.options.reconnect;
 		this.verbose = this.options.verbose;
+		this.connectionPhase = false;
 		// console.log(this);
 	}
 
@@ -68,6 +70,17 @@ export class Client {
 		return this._connect();
 	}
 	async _connect() {
+		// console.trace("gRPC connection phase...");
+
+		if(this.connectionPhase) {
+			// console.log("WARNING: multiple gRPC connection phases!");
+			return new Promise((resolve) => {
+				this.onConnect(resolve);
+			})
+		}
+
+		this.connectionPhase = true;
+
 		// this.reconnect = true;
 		this.verbose && this.log('gRPC Client connecting to', this.options.host);
 		const RPC = this.getServiceClient();
@@ -120,6 +133,10 @@ export class Client {
 				resolve();
 			})
 		})
+
+		// console.log("gRPC connection phase finished...");
+		this.connectionPhase = false;
+
 	}
 
 	_setConnected(isConnected:boolean){
