@@ -9,6 +9,7 @@ import {
 	ServiceClientConstructor, KaspadPackage, SubscriberItem, SubscriberItemMap,
 	RPC as Rpc
 } from '../types/custom-types';
+import { resolve } from 'path';
 
  
 export class Client {
@@ -29,6 +30,7 @@ export class Client {
 	errorCBs:Function[] = [];
 	disconnectCBs:Function[] = [];
 	connectionPhase:boolean;
+	disableConnectionCheck:boolean;
 
 	constructor(options:any) {
 		this.options = Object.assign({
@@ -36,7 +38,7 @@ export class Client {
 			host: 'localhost:16210',
 			reconnect: true,
 			verbose : false,
-			uid:(Math.random()*1000).toFixed(0)
+			uid:(Math.random()*1000).toFixed(0),
 		}, options||{});
 		this.pending = { };
 		this.log = Function.prototype.bind.call(
@@ -47,6 +49,7 @@ export class Client {
 		this.reconnect = this.options.reconnect;
 		this.verbose = this.options.verbose;
 		this.connectionPhase = false;
+		this.disableConnectionCheck = options.disableConnectionCheck || false;
 		// console.log(this);
 	}
 
@@ -120,19 +123,24 @@ export class Client {
 			reconnect();
 		});
 
-		await new Promise<void>((resolve)=>{
-			dpc(100, async()=>{
-				let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
-				.catch(e=>{
-					this.connectFailureCBs.forEach(fn=>fn(e));
+		if(this.disableConnectionCheck) {
+			resolve();
+		}
+		else {
+			await new Promise<void>((resolve)=>{
+				dpc(100, async()=>{
+					let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
+					.catch(e=>{
+						this.connectFailureCBs.forEach(fn=>fn(e));
+					})
+					this.verbose && this.log("getVirtualSelectedParentBlueScoreRequest:response", response)
+					if(response && response.blueScore){
+						this._setConnected(true);
+					}
+					resolve();
 				})
-				this.verbose && this.log("getVirtualSelectedParentBlueScoreRequest:response", response)
-				if(response && response.blueScore){
-					this._setConnected(true);
-				}
-				resolve();
 			})
-		})
+		}
 
 		// console.log("gRPC connection phase finished...");
 		this.connectionPhase = false;
