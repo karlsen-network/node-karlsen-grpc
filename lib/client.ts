@@ -96,14 +96,14 @@ export class Client {
 
 		this.stream = this.createStream();
 		this.initIntake(this.stream);
-		const reconnect = () => {
+		const reconnect = (reason:string) => {
 			this._setConnected(false);
 			if(this.reconnect_dpc) {
 				clearDPC(this.reconnect_dpc);
 				delete this.reconnect_dpc;
 			}
 
-			this.clearPending();
+			this.clearPending(reason);
 			delete this.stream;
 			delete this.client;
 			if(this.reconnect) {
@@ -116,11 +116,11 @@ export class Client {
 			// console.log("client:",error);
 			this.errorCBs.forEach(fn=>fn(error.toString(), error));
 			this.verbose && this.log('stream:error', error);
-			reconnect();
+			reconnect(error);
 		})
 		this.stream.on('end', (...args:any) => {
 			this.verbose && this.log('stream:end', ...args);
-			reconnect();
+			reconnect('stream end');
 		});
 
 		if(this.disableConnectionCheck) {
@@ -184,10 +184,10 @@ export class Client {
 		this.clearPending();
 	}
 
-	clearPending() {
+	clearPending(reason?:string) {
 		Object.keys(this.pending).forEach(key => {
 			let list = this.pending[key];
-			list.forEach(o=>o.reject('closing by force'));
+			list.forEach(o=>o.reject(reason||'closing by force'));
 			this.pending[key] = [];
 		});
 	}
