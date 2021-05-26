@@ -14,7 +14,6 @@ message AddressesMessage{
 
 message NetAddress{
   int64 timestamp = 1;
-  uint64 services = 2;
   bytes ip = 3;
   uint32 port = 4;
 }
@@ -30,7 +29,6 @@ message TransactionMessage{
   uint64 lockTime = 4;
   SubnetworkId subnetworkId = 5;
   uint64 gas = 6;
-  Hash payloadHash = 7;
   bytes payload = 8;
 }
 
@@ -162,7 +160,7 @@ message OutpointAndUtxoEntryPair{
 message UtxoEntry {
   uint64 amount = 1;
   ScriptPublicKey scriptPublicKey = 2;
-  uint64 blockBlueScore = 3;
+  uint64 blockDaaScore = 3;
   bool isCoinbase = 4;
 }
 
