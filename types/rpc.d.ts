@@ -36,8 +36,7 @@ export namespace RPC {
 	interface UTXOEntry{
 		amount: number;
 		scriptPublicKey: ScriptPublicKey;
-		//blockBlueScore: number;
-		blockDaaScore: number;
+		blockBlueScore: number;
 		isCoinbase: boolean; 
 	}
 
@@ -240,10 +239,4 @@ export interface IRPC {
 	unSubscribe(eventName:string, uid:string='');
 
 	request?(method:string, data:any);
-
-	onConnect(cb:Function):void;
-	onDisconnect(cb:Function):void;
-	
-	disconnect();
-	connect():Promise<void>;
 }
