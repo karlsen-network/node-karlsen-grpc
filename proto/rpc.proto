@@ -27,13 +27,21 @@ message RpcBlock {
 
 message RpcBlockHeader {
   uint32 version = 1;
-  repeated string parentHashes = 2;
+  repeated RpcBlockLevelParents parents = 12;
   string hashMerkleRoot = 3;
   string acceptedIdMerkleRoot = 4;
   string utxoCommitment = 5;
   int64 timestamp = 6;
   uint32 bits = 7;
   uint64 nonce = 8;
+  uint64 daaScore = 9;
+  string blueWork = 10;
+  string pruningPoint = 14;
+  uint64 blueScore = 13;
+}
+
+message RpcBlockLevelParents {
+  repeated string parentHashes = 1;
 }
 
 message RpcBlockVerboseData{
@@ -61,6 +69,7 @@ message RpcTransactionInput {
   RpcOutpoint previousOutpoint = 1;
   string signatureScript = 2;
   uint64 sequence = 3;
+  uint32 sigOpCount = 5;
   RpcTransactionInputVerboseData verboseData = 4;
 }
 
@@ -90,7 +99,7 @@ message RpcUtxoEntry {
 message RpcTransactionVerboseData{
   string transactionId = 1;
   string hash = 2;
-  uint64 size = 3;
+  uint64 mass = 4;
   string blockHash = 12;
   uint64 blockTime = 14;
 }
@@ -273,6 +282,7 @@ message AddPeerResponseMessage{
 // SubmitTransactionRequestMessage submits a transaction to the mempool
 message SubmitTransactionRequestMessage{
   RpcTransaction transaction = 1;
+  bool allowOrphan = 2;
 }
 
 message SubmitTransactionResponseMessage{
@@ -301,17 +311,7 @@ message VirtualSelectedParentChainChangedNotificationMessage{
   repeated string removedChainBlockHashes = 1;
 
   // The chain blocks that were added, in low-to-high order
-  repeated ChainBlock addedChainBlocks = 2;
-}
-
-message ChainBlock{
-  string hash = 1;
-  repeated AcceptedBlock acceptedBlocks = 2;
-}
-
-message AcceptedBlock{
-  string hash = 1;
-  repeated string acceptedTransactionIds = 2;
+  repeated string addedChainBlockHashes = 3;
 }
 
 // GetBlockRequestMessage requests information about a specific block
@@ -320,7 +320,7 @@ message GetBlockRequestMessage{
   string hash = 1;
 
   // Whether to include transaction data in the response
-  bool includeTransactionVerboseData = 3;
+  bool includeTransactions = 3;
 }
 
 message GetBlockResponseMessage{
@@ -351,7 +351,7 @@ message GetVirtualSelectedParentChainFromBlockResponseMessage{
   repeated string removedChainBlockHashes = 1;
 
   // The chain blocks that were added, in low-to-high order
-  repeated ChainBlock addedChainBlocks = 2;
+  repeated string addedChainBlockHashes = 3;
 
   RPCError error = 1000;
 }
@@ -361,7 +361,7 @@ message GetVirtualSelectedParentChainFromBlockResponseMessage{
 message GetBlocksRequestMessage{
   string lowHash = 1;
   bool includeBlocks = 2;
-  bool includeTransactionVerboseData = 3;
+  bool includeTransactions = 3;
 }
 
 message GetBlocksResponseMessage{
@@ -606,5 +606,18 @@ message GetInfoRequestMessage{
 message GetInfoResponseMessage{
   string p2pId = 1;
   uint64 mempoolSize = 2;
+  string serverVersion = 3;
   RPCError error = 1000;
 }
+
+message EstimateNetworkHashesPerSecondRequestMessage{
+  uint32 windowSize = 1;
+  string startHash = 2;
+}
+
+message EstimateNetworkHashesPerSecondResponseMessage{
+  uint64 networkHashesPerSecond = 1;
+  RPCError error = 1000;
+}
+
+
