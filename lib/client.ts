@@ -72,79 +72,84 @@ export class Client {
 		this.reconnect = true;
 		return this._connect();
 	}
+
 	async _connect() {
 		// console.trace("gRPC connection phase...");
-
-		if(this.connectionPhase) {
+		this.verbose && this.log('gRPC Client connecting to', this.options.host);
+		if(!this.client){
+			const RPC = this.getServiceClient();
+			this.client = new RPC(this.options.host, gRPC.credentials.createInsecure(),
+				{ 
+					// "grpc.keepalive_timeout_ms": 25000 
+					"grpc.max_receive_message_length": -1
+				}
+			);
+		}else{
 			// console.log("WARNING: multiple gRPC connection phases!");
 			return new Promise((resolve) => {
 				this.onConnect(resolve);
 			})
 		}
 
-		this.connectionPhase = true;
-
-		// this.reconnect = true;
-		this.verbose && this.log('gRPC Client connecting to', this.options.host);
-		const RPC = this.getServiceClient();
-		this.client = new RPC(this.options.host, gRPC.credentials.createInsecure(),
-			{ 
-				// "grpc.keepalive_timeout_ms": 25000 
-				"grpc.max_receive_message_length": -1
-			}
-		);
-
-		this.stream = this.createStream();
-		this.initIntake(this.stream);
-		const reconnect = (reason:string) => {
-			this._setConnected(false);
-			if(this.reconnect_dpc) {
-				clearDPC(this.reconnect_dpc);
-				delete this.reconnect_dpc;
-			}
-
-			this.clearPending(reason);
-			delete this.stream;
-			delete this.client;
-			if(this.reconnect) {
-				this.reconnect_dpc = dpc(1000, () => {
-					this._connect();
-				})
-			}
+		await this._connectClient();
+	}
+	_reconnect(reason:string){
+		this._setConnected(false);
+		if(this.reconnect_dpc) {
+			clearDPC(this.reconnect_dpc);
+			delete this.reconnect_dpc;
 		}
-		this.stream.on('error', (error:any) => {
-			// console.log("client:",error);
-			this.errorCBs.forEach(fn=>fn(error.toString(), error));
-			this.verbose && this.log('stream:error', error);
-			reconnect(error);
-		})
-		this.stream.on('end', (...args:any) => {
-			this.verbose && this.log('stream:end', ...args);
-			reconnect('stream end');
-		});
 
-		if(this.disableConnectionCheck) {
-			resolve();
-		}
-		else {
-			await new Promise<void>((resolve)=>{
-				dpc(100, async()=>{
-					let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
-					.catch(e=>{
-						this.connectFailureCBs.forEach(fn=>fn(e));
-					})
-					this.verbose && this.log("getVirtualSelectedParentBlueScoreRequest:response", response)
-					if(response && response.blueScore){
-						this._setConnected(true);
-					}
-					resolve();
-				})
+		this.clearPending(reason);
+		delete this.stream;
+		//delete this.client;
+		if(this.reconnect) {
+			this.reconnect_dpc = dpc(1000, () => {
+				this._connectClient();
 			})
 		}
+	}
+	async _connectClient(){
+		this.client.waitForReady(2500, (connect_error:any)=>{
+			
+			if(connect_error){
+				//console.log("connect_error")
+				//this.connectionPhase = false;
+				this._reconnect('client connect deadline reached');
+				return resolve();
+			}
 
-		// console.log("gRPC connection phase finished...");
-		this.connectionPhase = false;
+			console.log("client connected")
 
+			this.stream = this.createStream();
+			this.initIntake(this.stream);
+			
+			this.stream.on('error', (error:any) => {
+				// console.log("client:",error);
+				this.errorCBs.forEach(fn=>fn(error.toString(), error));
+				this.verbose && this.log('stream:error', error);
+				this._reconnect(error);
+			})
+			this.stream.on('end', (...args:any) => {
+				this.verbose && this.log('stream:end', ...args);
+				this._reconnect('stream end');
+			});
+
+			if(this.disableConnectionCheck)
+				return resolve();
+			
+			dpc(100, async()=>{
+				let response:any = await this.call('getVirtualSelectedParentBlueScoreRequest', {})
+				.catch(e=>{
+					this.connectFailureCBs.forEach(fn=>fn(e));
+				})
+				this.verbose && this.log("getVirtualSelectedParentBlueScoreRequest:response", response)
+				if(response && response.blueScore){
+					this._setConnected(true);
+				}
+				resolve();
+			})
+		})
 	}
 
 	_setConnected(isConnected:boolean){
