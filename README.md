@@ -1,18 +1,20 @@
-Kaspa gRPC interface
-===
+# Karlsen gRPC interface
 
-Kaspa gRPC module is a basic request/response wrapper for interfacing with [Kaspad](https://github.com/kaspanet/kaspad)
+Karlsen gRPC module is a basic request/response wrapper for interfacing with [Karlsend](https://github.com/karlsen-network/karlsend)
 
-Usage
----
+## Usage
+
 Clone the following repository:
 
-    $ git clone https://github.com/aspectron/kaspa-grpc
+```
+git clone https://github.com/karlsen-network/node-karlsen-grpc
+```
 
-Example
----
-```js
-const { Client } = require('@kaspa/grpc');
+## Example
+
+```
+js
+const { Client } = require('@karlsen/grpc');
 
 const client = new Client({
     host:"127.0.0.1:16210"
