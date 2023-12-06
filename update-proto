@@ -1,9 +1,9 @@
-#! /bin/sh
+#!/usr/bin/sh
 
 cd proto
 rm -f *.proto
-wget -q --show-progress https://raw.githubusercontent.com/kaspanet/kaspad/master/infrastructure/network/netadapter/server/grpcserver/protowire/messages.proto
-wget -q --show-progress https://raw.githubusercontent.com/kaspanet/kaspad/master/infrastructure/network/netadapter/server/grpcserver/protowire/p2p.proto
-wget -q --show-progress https://raw.githubusercontent.com/kaspanet/kaspad/master/infrastructure/network/netadapter/server/grpcserver/protowire/rpc.proto
+wget -q --show-progress https://raw.githubusercontent.com/karlsen-network/karlsend/master/infrastructure/network/netadapter/server/grpcserver/protowire/messages.proto
+wget -q --show-progress https://raw.githubusercontent.com/karlsen-network/karlsend/master/infrastructure/network/netadapter/server/grpcserver/protowire/p2p.proto
+wget -q --show-progress https://raw.githubusercontent.com/karlsen-network/karlsend/master/infrastructure/network/netadapter/server/grpcserver/protowire/rpc.proto
 # git --no-pager diff
 git status
