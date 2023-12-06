@@ -35,7 +35,7 @@ export class Client {
 	constructor(options:any) {
 		this.options = Object.assign({
 			protoPath: __dirname + '/../../proto/messages.proto',
-			host: 'localhost:16210',
+			host: 'localhost:42210',
 			reconnect: true,
 			verbose : false,
 			uid:(Math.random()*1000).toFixed(0),
