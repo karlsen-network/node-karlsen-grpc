@@ -19,12 +19,12 @@ export interface IData{
 }
 export declare type IStream = any;
 
-export interface KaspadPackage extends GrpcObject{
+export interface KarlsendPackage extends GrpcObject{
     RPC: ServiceClientConstructor
 }
 
 export interface MessagesProto extends GrpcObject{
-    protowire: KaspadPackage
+    protowire: KarlsendPackage
 }
 
 export interface SubscriberItem{

@@ -1,7 +1,7 @@
 {
-  "name": "@kaspa/grpc",
+  "name": "@karlsen/grpc",
   "version": "1.4.0",
-  "description": "Node gRPC interface for Kaspa",
+  "description": "Node gRPC interface for Karlsen",
   "main": "dist/index.js",
   "author": "ASPECTRON Inc",
   "license": "ISC",

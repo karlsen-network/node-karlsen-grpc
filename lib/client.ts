@@ -6,7 +6,7 @@ import * as gRPC from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import {
 	PendingReqs, IData, IStream, QueueItem, MessagesProto,
-	ServiceClientConstructor, KaspadPackage, SubscriberItem, SubscriberItemMap,
+	ServiceClientConstructor, KarlsendPackage, SubscriberItem, SubscriberItemMap,
 	RPC as Rpc
 } from '../types/custom-types';
 import { resolve } from 'path';
@@ -22,7 +22,7 @@ export class Client {
 	reconnect_dpc:number|undefined;
 	verbose:boolean = false;
 	log:Function;
-	proto:KaspadPackage|undefined;
+	proto:KarlsendPackage|undefined;
 	subscribers: SubscriberItemMap = new Map();
 	isConnected:boolean=false;
 	connectCBs:Function[] = [];
@@ -44,7 +44,7 @@ export class Client {
 		this.log = Function.prototype.bind.call(
 			console.log,
 			console,
-			`[Kaspa gRPC ${this.options.uid}]:`
+			`[Karlsen gRPC ${this.options.uid}]:`
 		);
 		this.reconnect = this.options.reconnect;
 		this.verbose = this.options.verbose;
