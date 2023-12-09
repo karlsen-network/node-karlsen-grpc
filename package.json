@@ -3,13 +3,17 @@
   "version": "1.4.0",
   "description": "Node gRPC interface for Karlsen",
   "main": "dist/index.js",
-  "author": "Karlsen Developers",
-  "license": "ISC",
-  "contributors": [
+  "authors": [
     {
-      "name": "ASPECTRON Inc"
+      "name": "ASPECTRON Inc",
+      "email": "info@aspectron.com"
+    },
+    {
+      "name": "Karlsen Developers",
+      "email": "lemois1337@protonmail.com"
     }
   ],
+  "license": "ISC",
   "scripts": {
     "watch": "tsc --watch",
     "prepublishOnly": "rm -rf ./dist && rm -f package-lock.json && npm install --also=dev && tsc"

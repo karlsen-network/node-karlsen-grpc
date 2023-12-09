@@ -12,8 +12,7 @@ git clone https://github.com/karlsen-network/node-karlsen-grpc
 
 ## Example
 
-```
-js
+```js
 const { Client } = require('@karlsen/grpc');
 
 const client = new Client({
