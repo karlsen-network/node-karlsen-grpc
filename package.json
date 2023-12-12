@@ -1,6 +1,6 @@
 {
   "name": "@karlsen/grpc",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Node gRPC interface for Karlsen",
   "main": "dist/index.js",
   "authors": [

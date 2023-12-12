@@ -2,12 +2,18 @@
 
 Karlsen gRPC module is a basic request/response wrapper for interfacing with [Karlsend](https://github.com/karlsen-network/karlsend)
 
-## Usage
+## Installing karlsen-grpc
 
-Clone the following repository:
+```
+npm install -g @karlsen/grpc
+```
+
+## Cloning karlsen-grpc
 
 ```
 git clone https://github.com/karlsen-network/node-karlsen-grpc
+cd node-karlsen-grpc
+npm install
 ```
 
 ## Example
